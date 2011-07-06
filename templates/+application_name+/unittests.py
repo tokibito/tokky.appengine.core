@@ -3,12 +3,16 @@ import os
 import sys
 
 try:
-    import unittest2
+    import unittest2 as unittest
 except ImportError:
-    sys.stdout.write('Please install unittest2. (eg easy_install unittest2)\n')
+    if (sys.version_info.major, sys.version_info.minor) >= (2, 7):
+        import unittest
+    else:
+        sys.stdout.write('Please install unittest2. (eg easy_install unittest2)\n')
+        sys.exit()
 
 
-class TestBedTestCase(unittest2.TestCase):
+class TestBedTestCase(unittest.TestCase):
     def _setup_testbed(self):
         from google.appengine.ext import testbed
         self.testbed = testbed.Testbed()
@@ -43,9 +47,9 @@ def main():
     sys.path.insert(0, search_sdk_path())
     import dev_appserver
     dev_appserver.fix_sys_path()
-    suite = unittest2.loader.TestLoader().discover(
+    suite = unittest.loader.TestLoader().discover(
         os.path.dirname(os.path.abspath(__file__)))
-    unittest2.TextTestRunner(verbosity=2).run(suite)
+    unittest.TextTestRunner(verbosity=2).run(suite)
 
 
 if __name__ == '__main__':
