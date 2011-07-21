@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import sys
+from StringIO import StringIO
 
 try:
     import unittest2 as unittest
@@ -8,7 +9,8 @@ except ImportError:
     if (sys.version_info.major, sys.version_info.minor) >= (2, 7):
         import unittest
     else:
-        sys.stdout.write('Please install unittest2. (eg easy_install unittest2)\n')
+        sys.stdout.write('Please install unittest2.'\
+            '(eg easy_install unittest2)\n')
         sys.exit()
 
 
@@ -28,6 +30,31 @@ class TestBedTestCase(unittest.TestCase):
 
     def tearDown(self):
         self._teardown_testbed()
+
+
+class DummyResponse(object):
+    def getvalue(self):
+        return self.out.getvalue()
+
+    def reset(self):
+        self.out = StringIO()
+
+
+def create_test_handler(handler_class):
+    instance = handler_class()
+    instance.request = {}
+    instance.response = DummyResponse()
+    instance.response.reset()
+    return instance
+
+
+class HandlerTestCase(TestBedTestCase):
+    def _setup_handler(self):
+        self.handler = create_test_handler(self.__class__.handler_class)
+
+    def setUp(self):
+        super(HandlerTestCase, self).setUp()
+        self._setup_handler()
 
 
 def search_sdk_path():
