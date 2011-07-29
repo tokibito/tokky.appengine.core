@@ -13,12 +13,16 @@ handlers:
 - url: /css
   static_dir: static/css
 
-- url: .*
-  script: main.py
-
 - url: /remote_api
   script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py
   login: admin
+
+- url: /datastore_admin
+  script: $PYTHON_LIB/google/appengine/ext/datastore_admin/main.py
+  login: admin
+
+- url: .*
+  script: main.py
 
 skip_files:
 - ^(.*/)?app\.yaml
@@ -33,3 +37,24 @@ skip_files:
 - ^(.*/)?doctests\.py[co]?
 - ^(.*/)?unittests\.py[co]?
 - ^(.*/)?.*tests\.py[co]?
+
+builtins:
+- datastore_admin: on
+#- deferred: on
+
+#inbound_services:
+#- warmup
+
+#admin_console:
+#  pages:
+#  - name: Custom Page
+#    url: /admin/
+
+#error_handlers:
+#  - file: default_error:html
+#
+#  - error_code: over_quota
+#    file: over_quota.html
+#
+#  - error_code: timeout
+#    file: timeout.html

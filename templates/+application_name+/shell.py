@@ -74,6 +74,7 @@ def main():
     dev_appserver.fix_sys_path()
 
     from google.appengine.api import apiproxy_stub_map, datastore_file_stub
+    from google.appengine.api.memcache import memcache_stub
     # from kay-fw
     appid = get_appid()
     os.environ['APPLICATION_ID'] = appid
@@ -84,6 +85,8 @@ def main():
     stub = datastore_file_stub.DatastoreFileStub(appid, datastore_path,
                                                    history_path)
     apiproxy_stub_map.apiproxy.RegisterStub('datastore_v3', stub)
+    apiproxy_stub_map.apiproxy.RegisterStub('memcache',
+        memcache_stub.MemcacheServiceStub())
 
     try:
         ipython()

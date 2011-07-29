@@ -21,6 +21,7 @@ class TestBedTestCase(unittest.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
+        self.testbed.init_taskqueue_stub()
 
     def _teardown_testbed(self):
         self.testbed.deactivate()
@@ -38,6 +39,7 @@ class DummyResponse(object):
 
     def reset(self):
         self.out = StringIO()
+        self.headers = {}
 
 
 def create_test_handler(handler_class):
