@@ -2,3 +2,6 @@ syntax: glob
 *.pyc
 *.orig
 *.zip
+
+syntax: regexp
+build/
