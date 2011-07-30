@@ -1,5 +1,3 @@
-import re
-
 from google.appengine.ext import webapp
 
 from core.generics import TemplatePageHandler
