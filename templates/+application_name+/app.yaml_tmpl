@@ -42,6 +42,7 @@ skip_files:
 builtins:
 - datastore_admin: on
 #- deferred: on
+#- appstats: on
 
 #inbound_services:
 #- warmup

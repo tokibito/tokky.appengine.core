@@ -1,6 +1,9 @@
 # webapp debug flag
 DEBUG = True
 
+# appstats
+ENABLE_APPSTATS = False
+
 # installed apps
 APPS = [
     # (r'^/$', 'apps.toppage.application'),
