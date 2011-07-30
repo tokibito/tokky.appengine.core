@@ -37,6 +37,7 @@ skip_files:
 - ^(.*/)?doctests\.py[co]?
 - ^(.*/)?unittests\.py[co]?
 - ^(.*/)?.*tests\.py[co]?
+- ^(.*/)?LICENSE\.txt
 
 builtins:
 - datastore_admin: on

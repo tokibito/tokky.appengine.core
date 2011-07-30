@@ -41,3 +41,15 @@ tokky.appengine.core は `aodag.scaffold`_ のコマンドから使用します�
 これでインストールは完了です。
 
 .. _`aodag.scaffold`: http://pypi.python.org/pypi/aodag.scaffold/
+
+ソースコード
+============
+
+オリジナルのソースコードは bitbucket.org 上のリポジトリで管理されています。
+
+https://bitbucket.org/tokibito/tokky.appengine.core/
+
+ライセンス
+==========
+
+tokky.appengine.core のソースコードのライセンスは、 New BSD License とします。
