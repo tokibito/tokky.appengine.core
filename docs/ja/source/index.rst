@@ -8,7 +8,7 @@ tokky.appengine.core ドキュメント
    :maxdepth: 2
 
    intro
-   project
+   application
 
 索引
 ====
