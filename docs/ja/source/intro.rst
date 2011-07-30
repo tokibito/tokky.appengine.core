@@ -10,7 +10,12 @@ tokky.appengine.core は `GoogleAppEngine`_ (以降AppEngine)用のアプリケ�
 AppEngine の Python 版のSDKに含まれている `webapp フレームワーク`_ をベースとして、少しだけ便利にする機能を提供します。
 大きめのアプリケーションを作る場合などに楽かもしれません。
 
-機能単位のURLルーティングと、設定による自動ロードを提供します。
+次に示す機能を提供します:
+
+* 機能単位のURLルーティング
+* 設定によるアプリケーションの自動ロード
+* unittestの実行
+* doctestの実行
 
 .. _`GoogleAppEngine`: http://code.google.com/appengine/
 .. _`webapp フレームワーク`: http://code.google.com/appengine/docs/python/tools/webapp/
