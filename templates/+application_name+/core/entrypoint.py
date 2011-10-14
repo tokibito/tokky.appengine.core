@@ -36,7 +36,11 @@ def application(environ, start_response):
             # path info hack
             path_prefix = environ['PATH_PREFIX'] = match_obj.group()
             path_info = environ['ROOT_PATH_INFO'] = environ['PATH_INFO']
-            environ['PATH_INFO'] = '/' + path_info[len(path_prefix):]
+            new_path_info = path_info[len(path_prefix):]
+            if new_path_info.startswith('/'):
+                environ['PATH_INFO'] = new_path_info
+            else:
+                environ['PATH_INFO'] = '/' + new_path_info
             match_app = app
             break
     else:
