@@ -33,18 +33,44 @@ class TestBedTestCase(unittest.TestCase):
         self._teardown_testbed()
 
 
+class DummyRequest(dict):
+    def get_params(self):
+        return self
+
+    params = property(get_params)
+
+    def get_uri(self):
+        if 'uri' in self:
+            return self['uri']
+
+    def set_uri(self, value):
+        self['uri'] = value
+
+    uri = property(get_uri, set_uri)
+
+
 class DummyResponse(object):
     def getvalue(self):
         return self.out.getvalue()
 
     def reset(self):
-        self.out = StringIO()
+        self.clear()
         self.headers = {}
+        self.status_code = 200
+
+    def clear(self):
+        self.out = StringIO()
+
+    def set_status(self, status_code):
+        self.status_code = status_code
+
+    def error(self, status_code):
+        self.set_status(status_code)
 
 
 def create_test_handler(handler_class):
     instance = handler_class()
-    instance.request = {}
+    instance.request = DummyRequest()
     instance.response = DummyResponse()
     instance.response.reset()
     return instance
@@ -76,6 +102,7 @@ def main():
     sys.path.insert(0, search_sdk_path())
     import dev_appserver
     dev_appserver.fix_sys_path()
+    os.environ['SERVER_SOFTWARE'] = 'Development'
     suite = unittest.loader.TestLoader().discover(
         os.path.dirname(os.path.abspath(__file__)))
     unittest.TextTestRunner(verbosity=2).run(suite)

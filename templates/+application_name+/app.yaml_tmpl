@@ -13,14 +13,6 @@ handlers:
 - url: /css
   static_dir: static/css
 
-- url: /remote_api
-  script: $$PYTHON_LIB/google/appengine/ext/remote_api/handler.py
-  login: admin
-
-- url: /datastore_admin
-  script: $$PYTHON_LIB/google/appengine/ext/datastore_admin/main.py
-  login: admin
-
 - url: .*
   script: main.py
 
@@ -41,6 +33,7 @@ skip_files:
 
 builtins:
 - datastore_admin: on
+- remote_api: on
 #- deferred: on
 #- appstats: on
 

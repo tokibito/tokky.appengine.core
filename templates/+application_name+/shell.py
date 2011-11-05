@@ -50,21 +50,14 @@ def get_appid():
 
 def get_datastore_paths():
     """Returns a tuple with the path to the datastore and history file.
-
-    The datastore is stored in the same location as dev_appserver uses by
-    default, but the name is altered to be unique to this project so multiple
-    Django projects can be developed on the same machine in parallel.
-
-    Returns:
-      (datastore_path, history_path)
     """
     from google.appengine.tools import dev_appserver_main
     datastore_path = dev_appserver_main.DEFAULT_ARGS['datastore_path']
     history_path = dev_appserver_main.DEFAULT_ARGS['history_path']
-    datastore_path = datastore_path.replace("dev_appserver", "core_%s" %
-                                            get_appid())
-    history_path = history_path.replace("dev_appserver", "core_%s" %
-                                        get_appid())
+    #datastore_path = datastore_path.replace("dev_appserver", "core_%s" %
+    #                                        get_appid())
+    #history_path = history_path.replace("dev_appserver", "core_%s" %
+    #                                    get_appid())
     return datastore_path, history_path
 
 
@@ -72,12 +65,12 @@ def main():
     sys.path.insert(0, search_sdk_path())
     import dev_appserver
     dev_appserver.fix_sys_path()
-
     from google.appengine.api import apiproxy_stub_map, datastore_file_stub
     from google.appengine.api.memcache import memcache_stub
     # from kay-fw
-    appid = get_appid()
+    appid = 'dev~%s' % get_appid()
     os.environ['APPLICATION_ID'] = appid
+    os.environ['SERVER_SOFTWARE'] = 'Development/1.0'
     p = get_datastore_paths()
     datastore_path = p[0]
     history_path = p[1]
