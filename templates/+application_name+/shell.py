@@ -40,7 +40,7 @@ def get_appid():
     else:
         try:
             from google.appengine.tools import dev_appserver
-            appconfig, unused = dev_appserver.LoadAppConfig(
+            appconfig, unused, unused = dev_appserver.LoadAppConfig(
                   os.path.dirname(os.path.abspath(__file__)), {})
             appid = appconfig.application
         except ImportError:
