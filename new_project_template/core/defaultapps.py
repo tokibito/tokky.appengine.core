@@ -31,6 +31,10 @@ def not_found(environ, start_response):
     return get_404_page()
 
 
+def not_found_factory():
+    return not_found
+
+
 def webapp2_not_found_handler(request, response, e):
     """webapp2.WSGIApplication用の404ページのハンドラ
     """

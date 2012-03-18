@@ -7,7 +7,7 @@ ENABLE_APPSTATS = False
 
 # installed apps
 APPS = [
-    (r'^/_ah/warmup$', 'apps.warmup.handlers.application'),  # ウォームアップ用アプリケーション
+    (r'^/_ah/warmup$', 'apps.warmup.handlers.application_factory'),  # ウォームアップ用アプリケーション
 ]
 
 # global middleware
@@ -17,7 +17,7 @@ MIDDLEWARE = [
 ]
 
 # not found app
-NOT_FOUND_APP = 'core.defaultapps.not_found'
+NOT_FOUND_APP = 'core.defaultapps.not_found_factory'
 
 MEDIA_URL = '/'
 

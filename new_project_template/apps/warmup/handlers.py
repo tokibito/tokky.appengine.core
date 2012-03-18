@@ -17,6 +17,8 @@ class WarmupHandler(webapp2.RequestHandler):
         self.response.out.write('OK')
 
 
-application = core_wsgi.WSGIApplication([
+def application_factory():
+    application = core_wsgi.WSGIApplication([
         (r'.*', WarmupHandler),
-        ], debug=config.DEBUG)
+    ], debug=config.DEBUG)
+    return application

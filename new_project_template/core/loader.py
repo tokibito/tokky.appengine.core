@@ -9,9 +9,11 @@ def get_application(name):
     if name in _app_cache:
         app = _app_cache[name]
     else:
-        app = load_module(name)
+        app_factory = load_module(name)
+        app = app_factory()
         _app_cache[name] = app
     return app
+
 
 def load_module(name):
     bits = name.split('.')

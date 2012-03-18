@@ -15,6 +15,8 @@ from core import wsgi as core_wsgi
 #        self.response.out.write('OK')
 
 
-application = core_wsgi.WSGIApplication([
-    #(r'.*', MyAppHandler),
+def application_factory():
+    application = core_wsgi.WSGIApplication([
+        #(r'.*', MyAppHandler),
     ], debug=config.DEBUG)
+    return application
