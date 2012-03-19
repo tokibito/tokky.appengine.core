@@ -1,23 +1,18 @@
-==========================
-アプリケーションを作成する
-==========================
+======================
+プロジェクトを作成する
+======================
 
-AppEngine用のアプリケーションを作成します。
+GAE用のプロジェクトを作成します。
 
-新規にアプリケーションを作成する
+新規にプロジェクトを作成する
 ================================
 
-新規アプリケーションの作成は ``scaffold`` コマンドを実行します。
-このドキュメントでは `engineapp` という名前のアプリケーションを作成します。
+新規プロジェクトの作成はnew_project_templateディレクトリをコピーして使用します。
+ここでは `engineapp` という名前のプロジェクトを作成するので、コピーしたディレクトリの名前を変更します。
 
-::
+.. image:: static/rename_project_template.png
 
-   $ scaffold create tokky.appengine.core
-   application_name: engineapp
-
-これで雛型からアプリケーションディレクトリが作成されました。
-
-AppEngineの開発サーバを起動して、確認してみます。
+GAEの開発サーバを起動して、確認してみます。
 
 ::
 
@@ -25,99 +20,70 @@ AppEngineの開発サーバを起動して、確認してみます。
    $ dev_appserver.py .
 
 起動したアドレスをウェブブラウザで開いてみてください。
-何も設定していない状態では `404 not Found.` と表示されるはずです。
+何も設定していない状態では `404 Not Found` と表示されるはずです。
 
-トップページを有効にする
-========================
+.. note::
 
-トップページを有効にしてみましょう。
+   プロジェクトディレクトリのパスに日本語(マルチバイト文字)が含まれていると、テンプレートファイルの読み込み等でエラーになる可能性があります。
 
-engineapp ディレクトリ内の ``config.py`` というファイルをエディタで開き、 ``APPS`` の ``toppage`` と書かれた行のコメントアウトを消してください。
+テンプレート使ってページを表示する
+==================================
+
+`Django テンプレート`_ を使ってページを表示してみましょう。
+
+engineapp/apps ディレクトリ内に ``toppage.py`` というファイルを以下の内容で作成します。
+
+.. code-block:: python
+
+   from core import wsgi as core_wsgi
+   from core.generics import TemplatePageHandler
+
+   import config
+
+
+   # テンプレートファイルを使ってページを表示するクラスの定義
+   class TopPageHandler(TemplatePageHandler):
+       template_name = 'static/index.html'
+
+
+   # このトップページアプリケーションのエントリーポイント(WSGIアプリケーションを返す関数)
+   def application_factory():
+       # core_wsgi.WSGIApplicationでアプリケーションを作成して返します
+       application = core_wsgi.WSGIApplication([
+           (r'/', TopPageHandler),
+       ], debug=config.DEBUG)
+       return application
+
+ソースコード中で指定した ``static/index.html`` テンプレートファイルを作成します。
+
+.. code-block:: html
+
+   <html>
+   <head>
+     <title>hello world!</title>
+   </head>
+   <body>
+     <h1>hello world!</h1>
+   </body>
+   </html>
+
+engineapp ディレクトリ内の ``config.py`` というファイルをエディタで開き、 ``APPS`` にマッチするURLとアプリケーションを返す関数名をタプルで追記します。
 
 .. code-block:: python
 
    # installed apps
    APPS = [
-       (r'^/$', 'apps.toppage.application'),
+       (r'^/_ah/warmup$', 'apps.warmup.handlers.application_factory'),  # ウォームアップ用アプリケーション
+       (r'^/$', 'apps.toppage.application_factory'),  # 追記
    ]
+
+``APPS`` のリスト内には、正規表現とアプリケーションハンドラ(WSGIアプリケーション)のインポート名をタプルで記述しています。
+tokky.appengine.core では、このリスト内のタプルを順に参照し、URLに最初にマッチしたアプリケーションハンドラをロードして実行します。
+アプリケーションハンドラはURLにマッチしない限り、ロードされません。これは、スピンアップ時のパフォーマンス向上と、メモリ使用量の節約にも貢献しています。
 
 これでトップページが有効になりました。
 保存して、ウェブブラウザでもう一度開いてみると、 `hello world!` と表示されます。
 
 .. image:: static/helloworld.png
 
-トップページのテンプレートを変更する
-====================================
-
-有効にしたトップページの表示を変更してみましょう。
-
-このページは `Django テンプレート`_ ファイルからHTMLを生成しています。
-テンプレートファイルは ``engineapp/templates/index.html`` にあります。
-
-ファイルを次のように編集して保存します。
-
-.. code-block:: html+django
-
-   <html>
-     <head>
-       <meta http-equiv="Content-type" content="text/html; charset=UTF-8"/>
-       <title>こんにちは世界！</title>
-     </head>
-     <body>
-     <h1>こんにちは世界！</h1>
-     </body>
-   </html>
-
-.. note:: 日本語の内容を含むテンプレートファイルは、文字コードをUTF-8にして保存します。
-
-ウェブブラウザでトップページをリロードすると、表示が変更されたことを確認できます。
-
-.. image:: static/helloworld_ja.png
-
 .. _`Django テンプレート`: https://docs.djangoproject.com/en/dev/topics/templates/
-
-仕組みを知る
-============
-
-テンプレートファイルを使用してページを表示する仕組みについて見てみましょう。
-
-トップページのアプリケーションハンドラは、 ``engineapp/apps/toppage.py`` モジュールにあります。
-ファイルをエディタで開いてみて見ましょう。
-
-解説のコメントを加えたものを次に示します。
-
-.. code-block:: python
-
-   from google.appengine.ext import webapp
-
-   from core.generics import TemplatePageHandler
-
-   import config
-
-   # テンプレートファイルを使ってページを表示するクラスの定義
-   class TopPageHandler(TemplatePageHandler):
-       template_name = 'templates/index.html'  # このハンドラで使うテンプレートのパス
-
-   # このトップページアプリケーションのエントリーポイント(WSGIアプリケーション)
-   # webapp.WSGIApplicationをそのまま使用します
-   application = webapp.WSGIApplication([
-       (r'/', TopPageHandler),
-       ], debug=config.DEBUG)
-
-ここで使用している ``TemplatePageHandler`` は、 ``webapp.RequestHandler`` を継承したクラスです。
-``TemplatePageHandler`` は ``template_name`` で使用するテンプレートファイルのパスを指定します。
-
-モジュール内で定義された ``application`` は ``webapp.WSGIApplication`` を使用したWSGIアプリケーションの形になっています。
-最初に書き換えた ``config.py`` の ``APPS`` 部分をもう一度見てみましょう。
-
-.. code-block:: python
-
-   # installed apps
-   APPS = [
-       (r'^/$', 'apps.toppage.application'),
-   ]
-
-``APPS`` のリスト内には、正規表現とアプリケーションハンドラ(WSGIアプリケーション)のインポート名をタプルで記述しています。
-tokky.appengine.core では、このリスト内のタプルを順に参照し、URLに最初にマッチしたアプリケーションハンドラをロードして実行します。
-
-アプリケーションハンドラはURLにマッチしない限り、ロードされません。これは、スピンアップ時のパフォーマンス向上と、メモリ使用量の節約にも貢献しています。

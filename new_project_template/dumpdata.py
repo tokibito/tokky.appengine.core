@@ -1,22 +1,72 @@
 #!/usr/bin/env python
 import os
 import sys
+import types
 
 
-def ipython():
-    """django.core.management.commands.shell
-    """
-    try:
-        from IPython.frontend.terminal.embed import TerminalInteractiveShell
-        shell = TerminalInteractiveShell()
-        shell.mainloop()
-    except ImportError:
-        try:
-            from IPython.Shell import IPShell
-            shell = IPShell(argv=[])
-            shell.mainloop()
-        except ImportError:
-            raise
+def is_str(value):
+    return issubclass(type(value), types.UnicodeType) or \
+        issubclass(type(value), types.StringType)
+
+
+def is_int(value):
+    return issubclass(type(value), types.IntType) or \
+        issubclass(type(value), types.LongType)
+
+
+def load_class(name):
+    bits = name.split('.')
+    module_name = '.'.join(bits[:-1])
+    target_name = bits[-1]
+    __import__(module_name, {}, {}, [])
+    module = sys.modules[module_name]
+    return getattr(module, target_name)
+
+
+def to_yaml(data):
+    import yaml
+    result = yaml.safe_dump(data)
+    return result
+
+
+def object_to_dict(obj, fields):
+    from google.appengine.ext import db
+    result = {}
+    result['__class__'] = '%s.%s' % (
+        obj.__class__.__module__,
+        obj.__class__.__name__)
+    result['key_name'] = obj.key().name()
+    for attr_name, property_obj in obj.properties().items():
+        if fields:
+            if attr_name not in fields:
+                continue
+        origin_value = getattr(obj, attr_name, None)
+        if isinstance(property_obj, db.ReferenceProperty):
+          if origin_value is None:
+              value = None
+          else:
+              value = '<%s.%s:%s>' % (
+                  origin_value.__class__.__module__,
+                  origin_value.__class__.__name__,
+                  origin_value.key().name())
+        #elif is_str(origin_value):
+        #    value = origin_value.encode('utf-8')
+        #elif is_int(origin_value):
+        #    value = int(origin_value)
+        else:
+            value = origin_value
+        result[attr_name] = value
+    return result
+
+
+def dumpdata_from_model(model_class, fields):
+    data = {
+        'objects': []
+    }
+    objects = model_class.all().fetch(limit=1000)
+    for obj in objects:
+        data['objects'].append(object_to_dict(obj, fields))
+    return to_yaml(data)
 
 
 def search_sdk_path():
@@ -62,6 +112,10 @@ def get_datastore_paths():
 
 
 def main():
+    if len(sys.argv) < 2:
+        sys.stdout.write('dumpdata.py model_name [fields]\n')
+        sys.exit()
+
     sys.path.insert(0, search_sdk_path())
     import dev_appserver
     dev_appserver.fix_sys_path()
@@ -81,29 +135,13 @@ def main():
     apiproxy_stub_map.apiproxy.RegisterStub('memcache',
         memcache_stub.MemcacheServiceStub())
 
-    try:
-        ipython()
-    except ImportError:
-        import code
-        imported_objects = {}
-        try:
-            import readline
-        except ImportError:
-            pass
-        else:
-            import rlcompleter
-            readline.set_completer(
-                rlcompleter.Completer(imported_objects).complete)
-            readline.parse_and_bind("tab:complete")
+    fields = None
+    if len(sys.argv) > 2:
+        fields = [field_name for field_name in sys.argv[2].split(',')]
 
-            pythonrc = os.environ.get("PYTHONSTARTUP")
-            if pythonrc and os.path.isfile(pythonrc):
-                try:
-                    execfile(pythonrc)
-                except NameError:
-                    pass
-            import user
-        code.interact(local=imported_objects)
+    model_class = load_class(sys.argv[1])
+    result = dumpdata_from_model(model_class, fields)
+    sys.stdout.write(result + '\n')
 
 
 if __name__ == '__main__':

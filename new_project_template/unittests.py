@@ -48,6 +48,36 @@ class DummyRequest(dict):
 
     uri = property(get_uri, set_uri)
 
+    def get_scheme(self):
+        if 'scheme' in self:
+            return self['scheme']
+        return 'http'
+
+    def set_scheme(self, value):
+        self['scheme'] = value
+
+    scheme = property(get_scheme, set_scheme)
+
+    def set_headers(self, value):
+        self['headers'] = value
+
+    def get_headers(self):
+        if 'headers' in self:
+            return self['headers']
+        return {}
+
+    headers = property(get_headers, set_headers)
+
+    def set_environ(self, value):
+        self['environ'] = value
+
+    def get_environ(self):
+        if 'environ' in self:
+            return self['environ']
+        return {}
+
+    environ = property(get_environ, set_environ)
+
 
 class DummyResponse(object):
     def getvalue(self):
@@ -103,8 +133,12 @@ def main():
     import dev_appserver
     dev_appserver.fix_sys_path()
     os.environ['SERVER_SOFTWARE'] = 'Development'
-    suite = unittest.loader.TestLoader().discover(
-        os.path.dirname(os.path.abspath(__file__)))
+    os.environ['HTTP_HOST'] = 'localhost'
+    if len(sys.argv) >= 2:
+        discover_path = os.path.abspath(sys.argv[1])
+    else:
+        discover_path = os.path.dirname(os.path.abspath(__file__))
+    suite = unittest.loader.TestLoader().discover(discover_path)
     unittest.TextTestRunner(verbosity=2).run(suite)
 
 

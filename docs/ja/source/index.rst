@@ -9,6 +9,7 @@ tokky.appengine.core ドキュメント
 
    intro
    application
+   changes
 
 索引
 ====
