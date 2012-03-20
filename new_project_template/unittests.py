@@ -14,7 +14,7 @@ except ImportError:
         sys.exit()
 
 
-class TestBedTestCase(unittest.TestCase):
+class TestbedTestCase(unittest.TestCase):
     def _setup_testbed(self):
         from google.appengine.ext import testbed
         self.testbed = testbed.Testbed()
@@ -106,7 +106,7 @@ def create_test_handler(handler_class):
     return instance
 
 
-class HandlerTestCase(TestBedTestCase):
+class HandlerTestCase(TestbedTestCase):
     def _setup_handler(self):
         self.handler = create_test_handler(self.__class__.handler_class)
 
