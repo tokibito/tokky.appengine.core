@@ -8,7 +8,9 @@ tokky.appengine.core ドキュメント
    :maxdepth: 2
 
    intro
-   application
+   new_project
+   unittest
+   shell
    changes
 
 索引
